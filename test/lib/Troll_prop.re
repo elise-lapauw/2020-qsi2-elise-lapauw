@@ -97,10 +97,28 @@ describe("Troll Metamorphisme", ({test}) => {
         ~name="i_got_one increases score when an elf is killed",
         troll_elf_arbitrary,
         ((troll, elf)) => {
-          troll |> i_got_one(elf) |> scoring == scoring(troll) + value(elf) /* Not sure */
+          troll |> i_got_one(elf) |> scoring == scoring(troll) + value(elf)
         }
         )
         |> expect.ext.qCheckTest;
       ()
+  })
+});
+
+describe("Troll Injection", ({test}) => {
+  test(
+    "the score after i_got_one is different after the troll kills 2 different elfes",
+    ({expect}) => {
+      QCheck.Test.make(
+        ~count=1000,
+        ~name="the score after i_got_one is different after the troll kills 2 different elfes",
+        troll_two_elves_arbitrary,
+        ((troll, elf1, elf2)) => {
+          let troll1 = i_got_one(elf1, troll);
+          let troll2 = i_got_one(elf2, troll1);
+          scoring(troll1) < scoring(troll2);
+        }
+      ) |> expect.ext.qCheckTest;
+      ();
   })
 });
